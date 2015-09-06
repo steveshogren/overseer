@@ -1,4 +1,14 @@
 (ns overseer.web
+  (:import [java.util Arrays]
+           [com.google.api.client.googleapis.javanet GoogleNetHttpTransport]
+           [com.google.api.client.json.jackson2 JacksonFactory]
+           [com.google.api.client.googleapis.auth.oauth2
+            GoogleIdTokenVerifier
+            GoogleIdTokenVerifier$Builder
+            GoogleIdToken
+            GoogleIdToken$Payload
+            ]
+           )
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
@@ -26,6 +36,24 @@
                              [credentials :as creds])
             [environ.core :refer [env]])
   (:gen-class))
+
+(def transport (GoogleNetHttpTransport/newTrustedTransport))
+(def jsonFactory (JacksonFactory/getDefaultInstance))
+
+(defn verifyer []
+  (let [CLIENT_ID "test"]
+    (doto (new GoogleIdTokenVerifier$Builder transport jsonFactory)
+      (.setAudience (Arrays/asList CLIENT_ID))
+      (.build))))
+
+(defn verify [idTokenString]
+  (let [APP_DOMAIN_NAME ""]
+    (if-let [idToken (.verify (verifyer) idTokenString)]
+      (let [payload (.getPayload idToken)]
+        (if (= (.getHostedDomain payload) APP_DOMAIN_NAME)
+          (println (str "User ID: " (.getSubject payload)))
+          (println "Invalid ID token")))
+      (println "Invalid ID token"))))
 
 (def users {"admin" {:username "admin"
                      :password (creds/hash-bcrypt (env :admin))
