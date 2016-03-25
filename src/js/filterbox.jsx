@@ -12,7 +12,7 @@ var component = React.createClass({
         <input
           style={{width: "90%"}}
           type="text"
-          placeholder="Search..."
+          placeholder="Filter..."
           className="form-control"
           ref="filterText"
           onChange={this.filterChanged}/>
