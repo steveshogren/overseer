@@ -1,5 +1,4 @@
-var React = require('react'),
-    Skylight = require('react-skylight');
+var React = require('react');
 
 module.exports = React.createClass({
     show: function () {
@@ -23,14 +22,7 @@ module.exports = React.createClass({
         this.unbindEsc();
     },
     render: function () {
-        return <Skylight ref="modal" dialogStyles={{backgroundColor: '', boxShadow: ''}}>
-            <div className="panel panel-primary" style={{height: '95%'}}>
-                <div className="panel-heading">{this.props.title}</div>
-                <div className="panel-body">
-                    {this.props.children}
-                </div>
-            </div>
-        </Skylight>;
+        return <div>STUPID</div>;
     }
 });
 

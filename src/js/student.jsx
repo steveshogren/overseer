@@ -178,7 +178,7 @@ var exports = React.createClass({
                         <div className="row">
                             {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                             <div className="col-sm-4">
-                                <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
+                                <div id="hd-attended" className="col-sm-6"><b>Absent:</b> {attended}</div>
                                 <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
                                 <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
                                 <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
