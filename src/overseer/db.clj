@@ -59,22 +59,17 @@
   (make-user "demo" (env :userpass) #{roles/admin roles/user} "demo")
   )
 
-(defn create-all-tables []
-  (jdbc/execute! @pgdb [migrations/initialize-shared-tables])
-  (jdbc/execute! @pgdb [migrations/create-philly-schema-sql])
-  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/create-philly-schema-sql "demo")])
-  )
-
 (defn drop-all-tables []
-  (jdbc/execute! @pgdb [" DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS session_store; "])
-  (jdbc/execute! @pgdb [migrations/remove-philly-tables])
-  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/remove-philly-tables "demo")])
-  )
+  (jdbc/execute! @pgdb [(str "DROP TABLE IF EXISTS schema_migrations;"
+                             "DROP TABLE IF EXISTS users; "
+                             "DROP TABLE IF EXISTS session_store;"
+                             "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE;"
+                             "DROP SCHEMA IF EXISTS demo CASCADE;")]))
 
-;;(reset-db) 
+;;(reset-db)
 (defn reset-db []
   (drop-all-tables)
-  (create-all-tables)
+  (migrations/migrate-db @pgdb)
   (init-users))
 
 (defn append-schema [q]

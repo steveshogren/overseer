@@ -12,39 +12,6 @@
     (with-open [wrtr (io/writer (str "src/overseer/queries/" name ".sql"))]
       (.write wrtr data))))
 
-
-(comment "
- -- broken till otherwise noted
-  CREATE VIEW roundedswipes AS
-  SELECT
-     _id
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 9
-                  AND EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-              WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '16 hours')
-          ELSE s.in_time END)) as in_time
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '16 hours') 
-              WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') < 9)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-          ELSE s.out_time END)) AS out_time
-     , student_id
-   FROM phillyfreeschool.swipes s;
-")
-
-(def remove-philly-tables "
-    DROP TABLE IF EXISTS phillyfreeschool.years;
-    DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
-    DROP TABLE IF EXISTS phillyfreeschool.classes;
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
-    DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
-    DROP TABLE IF EXISTS phillyfreeschool.swipes;
-    DROP TABLE IF EXISTS phillyfreeschool.students;
-    DROP TABLE IF EXISTS phillyfreeschool.excuses;
-    DROP TABLE IF EXISTS phillyfreeschool.overrides;
-  ")
 (def initialize-shared-tables "
   CREATE TABLE users(
     user_id BIGSERIAL PRIMARY KEY,
@@ -61,8 +28,8 @@
     absolute_timeout BIGINT,
     value BYTEA
   );
-
   ")
+
 (def create-philly-schema-sql
   "
   create table phillyfreeschool.students(
@@ -147,18 +114,9 @@ $func$
 LANGUAGE sql;
   ")
 
-(defn drop-schema-tables-sql [name]
-  (replace-philly remove-philly-tables name))
-(defn create-schema-tables-sql [name]
-  (replace-philly create-philly-schema-sql name))
-
-(def mconfig
-  {:store :database
-   :db  (env :database-url)
-   })
+(defn migrate-db [con]
+  (migratus/migrate {:store :database
+                     :db con}))
 
 ;; (migratus/create mconfig "student start date")
-;; (migratus/migrate mconfig)
-;; (migratus/rollback mconfig)
-;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)
 

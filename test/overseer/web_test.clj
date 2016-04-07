@@ -87,9 +87,7 @@
           (testing "Start date is set"
             (is (= today (str (:start_date s)))))
           (student-att-is att 0 0 0 0)
-          )))
-  )
-
+          ))))
 
 (deftest swipe-attendence-override-test
   (do (sample-db)
@@ -244,8 +242,7 @@
 (deftest schema-isolation-test
   (do (conn/init-pg)
       (db/reset-db)
-      (binding [db/*school-schema* "demo"]
-        (make-sample-two-students-in-class))
+      ;; no need to create any students in demo, they are already there
       (let [resp (make-sample-two-students-in-class)
             att  (att/get-student-list)]
         (trace/trace "att: " att)

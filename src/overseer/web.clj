@@ -30,6 +30,7 @@
             [environ.core :refer [env]])
   (:gen-class))
 
+
 (defroutes app
   (GET "/" []
     (friend/authenticated (io/resource "index.html")))
@@ -76,13 +77,12 @@
       (wrap-session {:store (jdbc-store @conn/pgdb)
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-keyword-params
-      wrap-json-body wrap-json-params wrap-json-response ))
+      wrap-json-body wrap-json-params wrap-json-response))
 
 (defn -main [& [port]]
   (conn/init-pg)
   (db/init-users)
-  (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
-  (if-let [dev (env :dev)]
+  (when-let [dev (env :dev)]
     (clojure.java.shell/sh "notify-send" "Server started")
     (nrepl-server/start-server :port 7888 :handler
                                (apply clojure.tools.nrepl.server/default-handler
