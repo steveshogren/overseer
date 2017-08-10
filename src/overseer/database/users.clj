@@ -36,7 +36,7 @@
 
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
-(defn set-user-school [_id school]
+(logh/deftrace set-user-school [_id school]
   (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
 
 (defn make-new-school [school]
