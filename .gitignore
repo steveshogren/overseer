@@ -26,3 +26,4 @@ pom.xml
 
 *.sublime-project
 *.sublime-workspace
+*.log
